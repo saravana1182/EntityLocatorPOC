@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Domain;
-
+using EntityLocatorData;
 
 namespace EnitityLocator.Controllers
 {
@@ -23,9 +23,24 @@ namespace EnitityLocator.Controllers
 
             //identify the domain object by Category
 
-            Type type=Locator.Instance.Locate(setupViewModel.Category);
+            Type type=SetupCodeEntityResolver.Instance.Resolve(setupViewModel.Category);
 
-            var bClass = (ISetupEntityCode)Activator.CreateInstance(type);
+            var setupEntity = (ISetupEntityCode) Activator.CreateInstance(type);
+
+
+            EntityLocatorDbContext dbcontext = new EntityLocatorDbContext();
+
+            // setupEntity = Convert.ChangeType(setupEntity, type);
+
+            //CourtCode setupEntity = new CourtCode();
+
+            setupEntity.Code = setupViewModel.Code;
+            setupEntity.Description = setupViewModel.Description;
+
+            //dbcontext.Set(type);
+            dbcontext.Entry(setupEntity);
+            dbcontext.SaveChanges();
+            
 
             return View(setupViewModel);
         }
