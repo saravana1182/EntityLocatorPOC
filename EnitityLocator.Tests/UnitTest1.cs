@@ -10,7 +10,7 @@ namespace EnitityLocator.Tests
         public void TestMethod1()
         {
 
-            Locator.Instance.Locate("CC");
+            SetupCodeEntityResolver.Instance.Resolve("CC");
         }
     }
 }

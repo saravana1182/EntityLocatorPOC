@@ -7,6 +7,8 @@ namespace Domain
 {
     public interface ISetupEntityCode
     {
+
+       // static string CategoryType { get; set; }
        
         int Id { get; set; }
         string Code { get; set; }

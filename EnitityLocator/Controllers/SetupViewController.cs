@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Domain;
 using EntityLocatorData;
+using System.Data.Entity;
 
 namespace EnitityLocator.Controllers
 {
@@ -18,7 +19,7 @@ namespace EnitityLocator.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(SetupViewModel setupViewModel)
+        public ActionResult Save(SetupViewModel setupViewModel)
         {
 
             //identify the domain object by Category
@@ -32,17 +33,67 @@ namespace EnitityLocator.Controllers
 
             // setupEntity = Convert.ChangeType(setupEntity, type);
 
-            //CourtCode setupEntity = new CourtCode();
+            //  CourtCode setupEntity = new CourtCode();
 
+
+            //use auto mapper
+            setupEntity.Id = setupViewModel.Id;
             setupEntity.Code = setupViewModel.Code;
             setupEntity.Description = setupViewModel.Description;
-
+            setupEntity.StartDate = Convert.ToDateTime(setupViewModel.StartDate);
+            setupEntity.EndDate = Convert.ToDateTime(setupViewModel.EndDate);
             //dbcontext.Set(type);
-            dbcontext.Entry(setupEntity);
+            //dbcontext.Entry(setupEntity);
+            //dbcontext.SaveChanges();
+
+            var dbSet=dbcontext.Set(setupEntity.GetType()).Add(setupEntity);
+
             dbcontext.SaveChanges();
+
+            return RedirectToAction("Edit",new { Id = setupEntity.Id, Category = setupViewModel.Category });
+        }
+
+        public ActionResult Edit(int Id,string Category)
+        {
+
+
+
+
+            //Build an object for ESB and publish
+
             
 
-            return View(setupViewModel);
+
+
+
+            Type type = SetupCodeEntityResolver.Instance.Resolve(Category);
+
+            var setupEntity = (ISetupEntityCode)Activator.CreateInstance(type);
+
+
+            EntityLocatorDbContext dbcontext = new EntityLocatorDbContext();
+
+            var entitySet  = dbcontext.Set(setupEntity.GetType());
+
+            var queryables = entitySet as IQueryable<ISetupEntityCode>;
+
+            var codes = queryables.FirstOrDefault<ISetupEntityCode>(x => x.Id == Id);
+
+            var setupViewModel = new SetupViewModel
+            {
+                Category = Category,
+                Code = codes.Code,
+                Id = codes.Id,
+                Description = codes.Description,
+                StartDate = codes.StartDate,
+                EndDate = codes.EndDate
+            };
+
+
+
+            return View("Index", setupViewModel);
+
+
         }
     }
 }

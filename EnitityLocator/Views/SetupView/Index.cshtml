@@ -7,9 +7,11 @@
 <h2>SetupView</h2>
 
 
-@using (Html.BeginForm("Create","SetupView")) 
+@using (Html.BeginForm("Save","SetupView")) 
 {
     @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.Id);
     
     <div class="form-horizontal">
         <h4>SetupViewModel</h4>
